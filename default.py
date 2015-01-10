@@ -497,6 +497,53 @@ def search_tmdb(query,year):
             break
     return id    
 
+def getSteamTrailers():
+    tmdbTrailers=[]
+
+    url = 'http://api.steampowered.com/ISteamApps/GetAppList/v0002/'
+    req = urllib2.Request(url)
+
+    infostring = urllib2.urlopen(req).read()
+    jsonAppData = json.loads(infostring)
+    appDataArray = jsonAppData['applist']['apps']
+    random.shuffle(appDataArray)
+
+    for i in range(0, len(appDataArray)):
+        appId = appDataArray[i]['appid']
+        name = appDataArray[i]['name']
+
+        dict={'trailer':'steam','id': appId,'source':'steam','title':name}
+        tmdbTrailers.append(dict)
+
+    return tmdbTrailers
+
+def getSteamTrailer(appId):
+    data = {}
+    data['appids'] = appId
+    data['filters'] = 'movies'
+    url_values = urllib.urlencode(data)
+    url = 'http://store.steampowered.com/api/appdetails'
+    full_url = url + '?' + url_values
+    req = urllib2.Request(full_url)
+    infostring = urllib2.urlopen(req).read()
+    infostring = json.loads(infostring)
+    gameEntry = infostring[str(appId)]
+    if 'data' in gameEntry:
+        gameData = gameEntry['data']
+        if 'movies' in gameData:
+            movieData = gameData['movies']
+            random.shuffle(movieData)
+            movie = movieData[0]
+            if 'webm' in movie:
+                name = movie['name']
+                url = movie['webm']['max']
+                dict={'trailer':url,'id': appId,'source':'steam','title':name,'year':'20XX'}
+                return dict
+
+    print 'No movies for game with appid ' + str(appId)
+    return ''
+
+
 def getTmdbTrailer(movieId):
     trailer_url=''
     type=''
@@ -596,6 +643,15 @@ class trailerWindow(xbmcgui.WindowXMLDialog):
                 played=[]
         if trailer['trailer']=='tmdb':
             trailer=getTmdbTrailer(trailer['id'])
+        if trailer['trailer']=='steam':
+            newtrailer=getSteamTrailer(trailer['id'])
+            print 'NEWTRAILER' + str(newtrailer) + 'NEWTRAILER'
+            if newtrailer == '' or newtrailer['trailer'] == '':
+                trailer['trailer']=''
+                played.append(trailer['title'])
+                self.close()
+            trailer['trailer'] = newtrailer['trailer']
+            print 'PROCEEDING' + trailer['trailer'] + 'PROCEEDING'
         played.append(trailer['title'])
         source=trailer['source']
         if source=='library':
@@ -645,6 +701,8 @@ class trailerWindow(xbmcgui.WindowXMLDialog):
                 NUMBER_TRAILERS = NUMBER_TRAILERS -1
             if source == 'folder':
                 self.getControl(30011).setLabel('[B]'+trailer["title"] + ' - ' + trailer['source']+ ' ' + trailer['type']+'[/B]')
+            elif source == 'steam':
+                self.getControl(30011).setLabel('[B]' + trailer['title'] + ' - ' + trailer['source'] + '[/B]')
             else:
                 self.getControl(30011).setLabel('[B]'+trailer["title"] + ' - ' + trailer['source'] + ' ' + trailer['type'] + ' - ' + str(trailer["year"])+'[/B]')
             if hide_title == 'false':
@@ -988,7 +1046,10 @@ if not xbmc.Player().isPlaying() and not check_for_xsqueeze():
     if do_tmdb =='true':
         tmdbTrailers=getTmdbTrailers()
         for trailer in tmdbTrailers:
-            trailers.append(trailer)    
+            trailers.append(trailer)
+    steamTrailers = getSteamTrailers()
+    for trailer in steamTrailers:
+        trailers.append(trailer)
     exit_requested=False
     if dp.iscanceled():exit_requested=True 
     dp.close()
