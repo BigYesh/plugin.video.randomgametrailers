@@ -771,7 +771,7 @@ class trailerWindow(xbmcgui.WindowXMLDialog):
 class infoWindow(xbmcgui.WindowXMLDialog):
     def onInit(self):
         source = trailer['source']
-        info=getInfo(trailer['title'],trailer['year'])
+        #info=getInfo(trailer['title'],trailer['year'])
         self.getControl(30001).setImage(trailer["thumbnail"])
         self.getControl(30003).setImage(trailer["fanart"])
         title_font=getTitleFont()
@@ -969,93 +969,28 @@ def playTrailers():
                     xbmc.sleep(250)
         exit_requested=True
 
-def check_for_xsqueeze():
-    KEYMAPDESTFILE = os.path.join(xbmc.translatePath('special://userdata/keymaps'), "xsqueeze.xml")
-    if os.path.isfile(KEYMAPDESTFILE):
-        return True
-    else:
-        return False
-
-def get_mpaa(trailer):
-    Rating='NR'
-    if trailer["mpaa"].startswith('G'): Rating='G'
-    if trailer["mpaa"] == ('G'): Rating='G'
-    if trailer["mpaa"].startswith('Rated G'): Rating='G'
-    if trailer["mpaa"].startswith('PG '): Rating='PG'
-    if trailer["mpaa"] == ('PG'): Rating='PG'
-    if trailer["mpaa"].startswith('Rated PG'): Rating='PG'
-    if trailer["mpaa"].startswith('PG-13 '): Rating='PG-13'
-    if trailer["mpaa"] == ('PG-13'): Rating='PG-13'
-    if trailer["mpaa"].startswith('Rated PG-13'): Rating='PG-13'
-    if trailer["mpaa"].startswith('R '): Rating='R'
-    if trailer["mpaa"] == ('R'): Rating='R'
-    if trailer["mpaa"].startswith('Rated R'): Rating='R'
-    if trailer["mpaa"].startswith('NC17'): Rating='NC17'
-    if trailer["mpaa"].startswith('Rated NC17'): 'NC17'
-    return Rating
-
-if not xbmc.Player().isPlaying() and not check_for_xsqueeze():
-    DO_CURTIANS = addon.getSetting('do_animation')
+if not xbmc.Player().isPlaying():
     bs = blankWindow('script-BlankWindow.xml', addon_path,'default',)
     bs.show()
-    if do_volume == 'true':
-        muted = xbmc.getCondVisibility("Player.Muted")
-        if not muted and volume == 0:
-            xbmc.executebuiltin('xbmc.Mute()')
-        else:
-            xbmc.executebuiltin('XBMC.SetVolume('+str(volume)+')')
-    if DO_CURTIANS == 'true':
-        xbmc.Player().play(open_curtain_path)
-        while xbmc.Player().isPlaying():
-            xbmc.sleep(250)
+
     trailers = []
-    filtergenre = False
     trailerNumber = 0
-    library_trailers=[]
-    iTunes_trailers=[]
-    folder_trailers=[]
-    tmdb_trailers=''
-    if do_library == 'true':
-        if do_genre == 'true':
-            filtergenre = askGenres()
-        success = False
-        if filtergenre:
-            success, selectedGenre = selectGenre()
-        if success:
-            library_trailers = getLibraryTrailers(selectedGenre)
-        else:
-            library_trailers = getLibraryTrailers("")
+
     dp=xbmcgui.DialogProgress()
-    dp.create('Random Trailers','','','Loading Trailers')
-    if do_library == 'true':
-        for trailer in library_trailers:
-            trailers.append(trailer) 
-    if do_folder == 'true' and path !='':
-        folder_trailers = getFolderTrailers(path)
-        for trailer in folder_trailers:
-            trailerNumber=trailerNumber +1
-            title = xbmc.translatePath(trailer)
-            title =os.path.basename(title)
-            title =os.path.splitext(title)[0]   
-            dictTrailer={'title':title,'trailer':trailer,'type':'trailer','source':'folder','number':trailerNumber}
-            trailers.append(dictTrailer)
-    if do_itunes == 'true':
-        iTunes_trailers = getItunesTrailers()
-        for trailer in iTunes_trailers:
-            trailers.append(trailer)     
-    if do_tmdb =='true':
-        tmdbTrailers=getTmdbTrailers()
-        for trailer in tmdbTrailers:
-            trailers.append(trailer)
+    dp.create('Random Game Trailers','','','Loading Trailers')
+
     steamTrailers = getSteamTrailers()
     for trailer in steamTrailers:
         trailers.append(trailer)
     exit_requested=False
-    if dp.iscanceled():exit_requested=True 
+    if dp.iscanceled():
+        exit_requested=True
     dp.close()
+
     if len(trailers) > 0 and not exit_requested:
        playTrailers()
     del bs
+
     if do_volume == 'true':
         muted = xbmc.getCondVisibility("Player.Muted")
         if muted and volume == 0:
