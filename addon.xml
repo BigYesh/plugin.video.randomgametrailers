@@ -10,7 +10,7 @@
     <import addon="script.module.xbmcswift2"    version="2.4.0"/>
   </requires>
   <extension point="xbmc.python.script"			library="default.py" />
-  <provides>executable</provides>
+  <provides>video</provides>
   <extension point="xbmc.addon.metadata">
 	<language/>
     <platform>all</platform>
