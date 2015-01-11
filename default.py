@@ -23,7 +23,7 @@ import xml.dom.minidom
 from xml.dom.minidom import Node
 
 addon = xbmcaddon.Addon()
-# number_trailers =  0
+number_trailers = 0
 # volume = int(addon.getSetting("volume"))
 # quality = addon.getSetting("quality")
 # quality = ["480p", "720p", "1080p"][int(quality)]
@@ -51,7 +51,7 @@ addon_path = addon.getAddonInfo('path')
 played = []
 
 
-def getTitleFont():
+def get_title_font():
     title_font = 'font13'
     multiplier = 1
     skin_dir = xbmc.translatePath("special://skin/")
@@ -84,83 +84,81 @@ def getTitleFont():
     return title_font
 
 
-def getSteamTrailers():
-    tmdbTrailers = []
+def get_steam_trailers():
+    tmdb_trailers = []
 
     url = 'http://api.steampowered.com/ISteamApps/GetAppList/v0002/'
     req = urllib2.Request(url)
 
-    infostring = urllib2.urlopen(req).read()
-    jsonAppData = json.loads(infostring)
-    appDataArray = jsonAppData['applist']['apps']
-    random.shuffle(appDataArray)
+    info_string = urllib2.urlopen(req).read()
+    json_app_data = json.loads(info_string)
+    app_data_array = json_app_data['applist']['apps']
+    random.shuffle(app_data_array)
 
-    for i in range(0, len(appDataArray)):
-        appId = appDataArray[i]['appid']
-        name = appDataArray[i]['name']
+    for i in range(0, len(app_data_array)):
+        app_id = app_data_array[i]['appid']
+        name = app_data_array[i]['name']
 
-        dict = {'trailer': 'steam', 'id': appId, 'source': 'steam', 'title': name}
-        tmdbTrailers.append(dict)
+        trailer_info = {'trailer': 'steam', 'id': app_id, 'source': 'steam', 'title': name}
+        tmdb_trailers.append(trailer_info)
 
-    return tmdbTrailers
+    return tmdb_trailers
 
 
-def getSteamTrailer(appId):
-    data = {}
-    data['appids'] = appId
-    data['filters'] = 'movies'
+def get_steam_trailer(app_id):
+    data = {'appids': app_id, 'filters': 'movies'}
     url_values = urllib.urlencode(data)
     url = 'http://store.steampowered.com/api/appdetails'
     full_url = url + '?' + url_values
     req = urllib2.Request(full_url)
     infostring = urllib2.urlopen(req).read()
     infostring = json.loads(infostring)
-    gameEntry = infostring[str(appId)]
-    if 'data' in gameEntry:
-        gameData = gameEntry['data']
-        if 'movies' in gameData:
-            movieData = gameData['movies']
-            random.shuffle(movieData)
-            movie = movieData[0]
+    game_entry = infostring[str(app_id)]
+    if 'data' in game_entry:
+        game_data = game_entry['data']
+        if 'movies' in game_data:
+            movie_data = game_data['movies']
+            random.shuffle(movie_data)
+            movie = movie_data[0]
             if 'webm' in movie:
                 name = movie['name']
                 url = movie['webm']['max']
-                dict = {'trailer': url, 'id': appId, 'source': 'steam', 'title': name, 'year': '20XX'}
-                return dict
+                trailer_info = {'trailer': url, 'id': app_id, 'source': 'steam', 'title': name, 'year': '20XX'}
+                return trailer_info
 
-    print 'No movies for game with appid ' + str(appId)
+    print 'No movies for game with appid ' + str(app_id)
     return ''
 
 
-class blankWindow(xbmcgui.WindowXML):
+class BlankWindow(xbmcgui.WindowXML):
     def onInit(self):
         pass
 
 
-class trailerWindow(xbmcgui.WindowXMLDialog):
+class TrailerWindow(xbmcgui.WindowXMLDialog):
     def onInit(self):
         windowstring = xbmc.executeJSONRPC(
             '{"jsonrpc":"2.0","method":"GUI.GetProperties","params":{"properties":["currentwindow"]},"id":1}')
         windowstring = json.loads(windowstring)
         xbmc.log('Trailer_Window_id = ' + str(windowstring['result']['currentwindow']['id']))
         global played
-        global SelectedGene
+        #global SelectedGene
         global trailer
-        global info
-        global do_timeout
+        # global info
+        # global do_timeout
         global number_trailers
-        global trailercountF
+        # global trailercountF
         global source
         random.shuffle(trailers)
         trailercount = 0
         trailer = random.choice(trailers)
         while trailer['title'] in played:
             trailer = random.choice(trailers)
-            trailercount = trailercount + 1
+            trailercount += 1
             if trailercount == len(trailers):
                 played = []
         if trailer['trailer'] == 'steam':
-            newtrailer = getSteamTrailer(trailer['id'])
+            newtrailer = get_steam_trailer(trailer['id'])
             print 'NEWTRAILER' + str(newtrailer) + 'NEWTRAILER'
             if newtrailer == '' or newtrailer['trailer'] == '':
                 trailer['trailer'] = ''
@@ -170,16 +168,16 @@ class trailerWindow(xbmcgui.WindowXMLDialog):
             print 'PROCEEDING' + trailer['trailer'] + 'PROCEEDING'
         played.append(trailer['title'])
         source = trailer['source']
-        lastPlay = True
+        last_play = True
 
         url = trailer['trailer'].encode('ascii', 'ignore')
 
         xbmc.log(str(trailer))
 
-        if trailer["trailer"] != '' and lastPlay:
-            number_trailers = number_trailers - 1
+        if trailer["trailer"] != '' and last_play:
+            number_trailers -= 1
             xbmc.Player().play(url)
-            number_trailers = number_trailers - 1
+            number_trailers -= 1
             self.getControl(30011).setLabel('[B]' + trailer['title'] + ' - ' + trailer['source'] + '[/B]')
             self.getControl(30011).setVisible(False)
 
@@ -188,15 +186,15 @@ class trailerWindow(xbmcgui.WindowXMLDialog):
         self.close()
 
     def onAction(self, action):
-        ACTION_PREVIOUS_MENU = 10
-        ACTION_BACK = 92
-        ACTION_ENTER = 7
-        ACTION_I = 11
-        ACTION_LEFT = 1
-        ACTION_RIGHT = 2
-        ACTION_UP = 3
-        ACTION_TAB = 18
-        ACTION_M = 122
+        action_previous_menu = 10
+        action_back = 92
+        action_enter = 7
+        action_i = 11
+        action_left = 1
+        action_right = 2
+        action_up = 3
+        action_tab = 18
+        action_m = 122
 
         global exit_requested
         global movie_file
@@ -205,27 +203,27 @@ class trailerWindow(xbmcgui.WindowXMLDialog):
         movie_file = ''
         xbmc.log(str(action.getId()))
 
-        if action == ACTION_PREVIOUS_MENU or action == ACTION_LEFT or action == ACTION_BACK:
+        if action == action_previous_menu or action == action_left or action == action_back:
             xbmc.Player().stop()
             exit_requested = True
             self.close()
 
-        if action == ACTION_RIGHT or action == ACTION_TAB:
+        if action == action_right or action == action_tab:
             xbmc.Player().stop()
 
-        if action == ACTION_ENTER:
+        if action == action_enter:
             exit_requested = True
             xbmc.Player().stop()
             movie_file = trailer["file"]
             self.getControl(30011).setVisible(False)
             self.close()
 
-        if action == ACTION_M:
+        if action == action_m:
             self.getControl(30011).setVisible(True)
             xbmc.sleep(2000)
             self.getControl(30011).setVisible(False)
 
-        if action == ACTION_I or action == ACTION_UP:
+        if action == action_i or action == action_up:
             if source != 'folder':
                 self.getControl(30011).setVisible(False)
                 w = InfoWindow('script-DialogVideoInfo.xml', addon_path, 'default')
@@ -237,12 +235,10 @@ class trailerWindow(xbmcgui.WindowXMLDialog):
 
 class InfoWindow(xbmcgui.WindowXMLDialog):
     def onInit(self):
-        source = trailer['source']
-        title_font = getTitleFont()
-        title_string = trailer[
-            "title"]  # + ' - ' + trailer['source'] + ' ' + trailer['type'] + ' - ' + str(trailer["year"])
+        title_font = get_title_font()
+        title_string = trailer["title"]
         title = xbmcgui.ControlLabel(10, 40, 800, 40, title_string, title_font)
-        title = self.addControl(title)
+        self.addControl(title)
         title = self.getControl(3001)
         title.setAnimations([('windowclose', 'effect=fade end=0 time=1000')])
         if do_timeout:
@@ -305,7 +301,7 @@ def play_trailers():
             while not exit_requested and not xbmc.abortRequested:
                 if group_trailers:
                     group_count -= 1
-                my_trailer_window = trailerWindow('script-trailerwindow.xml', addon_path, 'default', )
+                my_trailer_window = TrailerWindow('script-trailerwindow.xml', addon_path, 'default', )
                 my_trailer_window.doModal()
                 del my_trailer_window
                 if group_trailers and group_count == 0:
@@ -318,7 +314,7 @@ def play_trailers():
             while number_trailers > 0:
                 if group_trailers:
                     group_count -= 1
-                my_trailer_window = trailerWindow('script-trailerwindow.xml', addon_path, 'default', )
+                my_trailer_window = TrailerWindow('script-trailerwindow.xml', addon_path, 'default', )
                 my_trailer_window.doModal()
                 del my_trailer_window
                 if group_trailers and group_count == 0:
@@ -333,7 +329,7 @@ def play_trailers():
 
 
 if not xbmc.Player().isPlaying():
-    bs = blankWindow('script-BlankWindow.xml', addon_path, 'default', )
+    bs = BlankWindow('script-BlankWindow.xml', addon_path, 'default', )
     bs.show()
 
     trailers = []
@@ -342,7 +338,7 @@ if not xbmc.Player().isPlaying():
     dp = xbmcgui.DialogProgress()
     dp.create('Random Game Trailers', '', '', 'Loading Trailers')
 
-    steamTrailers = getSteamTrailers()
+    steamTrailers = get_steam_trailers()
     for trailer in steamTrailers:
         trailers.append(trailer)
     exit_requested = False
