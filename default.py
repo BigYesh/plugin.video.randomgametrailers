@@ -39,7 +39,7 @@ addon_path = addon.getAddonInfo('path')
 # resources_path = xbmc.translatePath( os.path.join( addon_path, 'resources' ) ).decode('utf-8')
 # media_path = xbmc.translatePath( os.path.join( resources_path, 'media' ) ).decode('utf-8')
 # selectedGenre =''
-# exit_requested = False
+exit_requested = False
 # movie_file = ''
 #
 # if len(sys.argv) == 2:
@@ -142,12 +142,8 @@ class TrailerWindow(xbmcgui.WindowXMLDialog):
         windowstring = json.loads(windowstring)
         xbmc.log('Trailer_Window_id = ' + str(windowstring['result']['currentwindow']['id']))
         global played
-        #global SelectedGene
         global trailer
-        # global info
-        # global do_timeout
         global number_trailers
-        # global trailercountF
         global source
         random.shuffle(trailers)
         trailercount = 0
