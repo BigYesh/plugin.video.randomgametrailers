@@ -144,7 +144,7 @@ class trailerWindow(xbmcgui.WindowXMLDialog):
         global trailer
         global info
         global do_timeout
-        global NUMBER_TRAILERS
+        global number_trailers
         global trailercountF
         global source
         random.shuffle(trailers)
@@ -173,9 +173,9 @@ class trailerWindow(xbmcgui.WindowXMLDialog):
         xbmc.log(str(trailer))
 
         if trailer["trailer"] != '' and lastPlay:
-            NUMBER_TRAILERS = NUMBER_TRAILERS -1
+            number_trailers = number_trailers -1
             xbmc.Player().play(url)
-            NUMBER_TRAILERS = NUMBER_TRAILERS -1
+            number_trailers = number_trailers -1
             self.getControl(30011).setLabel('[B]' + trailer['title'] + ' - ' + trailer['source'] + '[/B]')
             self.getControl(30011).setVisible(False)
 
@@ -284,64 +284,58 @@ class infoWindow(xbmcgui.WindowXMLDialog):
 def play_trailers():
     global exit_requested
     global movie_file
-    global NUMBER_TRAILERS
-    global trailercount
+    global number_trailers
+    global trailer_count
     movie_file = ''
     exit_requested = False
-    DO_CURTIANS = addon.getSetting('do_animation')
-    DO_EXIT = addon.getSetting('do_exit')
-    NUMBER_TRAILERS =  int(addon.getSetting('number_trailers'))
-    GROUP_TRAILERS = False
-    if addon.getSetting('group_trailers')=='true':GROUP_TRAILERS = True
-    GROUP_NUMBER = int(addon.getSetting('group_number'))
-    GROUP_COUNT=GROUP_NUMBER
-    GROUP_DELAY = (int(addon.getSetting('group_delay')) * 60) * 1000
-    trailercount = 0
+    number_trailers = 0
+    group_trailers = False
+    if addon.getSetting('group_trailers') == 'true':
+        group_trailers = True
+    group_number = int(addon.getSetting('group_number'))
+    group_count=group_number
+    group_delay = (int(addon.getSetting('group_delay')) * 60) * 1000
+    trailer_count = 0
     while not exit_requested:
-        if NUMBER_TRAILERS == 0:
+        if number_trailers == 0:
             while not exit_requested and not xbmc.abortRequested:
-                if GROUP_TRAILERS:
-                    GROUP_COUNT=GROUP_COUNT - 1
-                mytrailerWindow = trailerWindow('script-trailerwindow.xml', addon_path,'default',)
-                mytrailerWindow.doModal()
-                del mytrailerWindow
-                if GROUP_TRAILERS and GROUP_COUNT==0:
-                    GROUP_COUNT=GROUP_NUMBER
-                    i = GROUP_DELAY
+                if group_trailers:
+                    group_count -= 1
+                my_trailer_window = trailerWindow('script-trailerwindow.xml', addon_path, 'default',)
+                my_trailer_window.doModal()
+                del my_trailer_window
+                if group_trailers and group_count == 0:
+                    group_count = group_number
+                    i = group_delay
                     while i > 0 and not exit_requested and not xbmc.abortRequested:
                         xbmc.sleep(500)
-                        i=i-500                      
+                        i -= 500
         else:
-            while NUMBER_TRAILERS > 0:
-                if GROUP_TRAILERS:
-                    GROUP_COUNT=GROUP_COUNT - 1
-                mytrailerWindow = trailerWindow('script-trailerwindow.xml', addon_path,'default',)
-                mytrailerWindow.doModal()
-                del mytrailerWindow
-                if GROUP_TRAILERS and GROUP_COUNT==0:
-                    GROUP_COUNT=GROUP_NUMBER
-                    i = GROUP_DELAY
+            while number_trailers > 0:
+                if group_trailers:
+                    group_count -= 1
+                my_trailer_window = trailerWindow('script-trailerwindow.xml', addon_path, 'default',)
+                my_trailer_window.doModal()
+                del my_trailer_window
+                if group_trailers and group_count == 0:
+                    group_count = group_number
+                    i = group_delay
                     while i > 0 and not exit_requested and not xbmc.abortRequested:
                         xbmc.sleep(500)
-                        i=i-500  
+                        i -= 500
                 if exit_requested:
                     break
-        if not exit_requested:
-            if DO_CURTIANS == 'true':
-                xbmc.Player().play(close_curtain_path)
-                while xbmc.Player().isPlaying():
-                    xbmc.sleep(250)
-        exit_requested=True
+        exit_requested = True
 
 if not xbmc.Player().isPlaying():
-    bs = blankWindow('script-BlankWindow.xml', addon_path,'default',)
+    bs = blankWindow('script-BlankWindow.xml', addon_path, 'default',)
     bs.show()
 
     trailers = []
     trailerNumber = 0
 
-    dp=xbmcgui.DialogProgress()
-    dp.create('Random Game Trailers','','','Loading Trailers')
+    dp = xbmcgui.DialogProgress()
+    dp.create('Random Game Trailers', '', '', 'Loading Trailers')
 
     steamTrailers = getSteamTrailers()
     for trailer in steamTrailers:
