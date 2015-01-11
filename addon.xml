@@ -11,10 +11,9 @@
   </requires>
   <extension point="xbmc.python.script"			library="default.py" />
   <extension point="xbmc.service"				library="service.py" start="login" />
-  <extension library="screensaver.py"           point="xbmc.ui.screensaver"/>
   <provides>executable</provides>
   <extension point="xbmc.addon.metadata">
-	<language></language>
+	<language/>
     <platform>all</platform>
     <summary lang="en">Plays Random Game Trailers from Steam</summary>
     <description lang="en">Plays random game trailers from Steam.
@@ -22,8 +21,8 @@
         RIGHT or X will display next trailer. LEFT or ESC will exit.
 	</description>
 	<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
-	<forum></forum>
-    <website></website>
+	<forum/>
+    <website/>
     <email>jayesh.coupland@gmail.com</email>
     <source>https://github.com/BigYesh/screensaver.randomgametrailers</source>
   </extension>
