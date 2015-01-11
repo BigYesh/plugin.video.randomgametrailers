@@ -258,40 +258,18 @@ def play_trailers():
     movie_file = ''
     exit_requested = False
     number_trailers = 0
-    group_trailers = False
-    if addon.getSetting('group_trailers') == 'true':
-        group_trailers = True
-    group_number = int(addon.getSetting('group_number'))
-    group_count = group_number
-    group_delay = (int(addon.getSetting('group_delay')) * 60) * 1000
     trailer_count = 0
     while not exit_requested:
         if number_trailers == 0:
             while not exit_requested and not xbmc.abortRequested:
-                if group_trailers:
-                    group_count -= 1
                 my_trailer_window = TrailerWindow('script-trailerwindow.xml', addon_path, 'default', )
                 my_trailer_window.doModal()
                 del my_trailer_window
-                if group_trailers and group_count == 0:
-                    group_count = group_number
-                    i = group_delay
-                    while i > 0 and not exit_requested and not xbmc.abortRequested:
-                        xbmc.sleep(500)
-                        i -= 500
         else:
             while number_trailers > 0:
-                if group_trailers:
-                    group_count -= 1
                 my_trailer_window = TrailerWindow('script-trailerwindow.xml', addon_path, 'default', )
                 my_trailer_window.doModal()
                 del my_trailer_window
-                if group_trailers and group_count == 0:
-                    group_count = group_number
-                    i = group_delay
-                    while i > 0 and not exit_requested and not xbmc.abortRequested:
-                        xbmc.sleep(500)
-                        i -= 500
                 if exit_requested:
                     break
         exit_requested = True
