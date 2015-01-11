@@ -1,53 +1,26 @@
-# Random trailer player
+# Random game trailer player
 #
-# Author - kzeleny
-# Version - 1.1.17
-# Compatibility - Frodo/Gothum
+# Based on random trailers by kzeleny
+#
+# Author - BigYesh
+# Version - 1.0.0
+# Compatibility - Kodi
 #
 
 import xbmc
-import xbmcvfs
 import xbmcgui
-from urllib import quote_plus, unquote_plus
-import datetime
+import xbmcaddon
 import urllib
 import urllib2
-import re
-import sys
 import os
 import random
 import json
-import time
-import xbmcaddon
 import xml.dom.minidom
-from xml.dom.minidom import Node
 
 addon = xbmcaddon.Addon()
 number_trailers = 0
-# volume = int(addon.getSetting("volume"))
-# quality = addon.getSetting("quality")
-# quality = ["480p", "720p", "1080p"][int(quality)]
-# currentVolume = xbmc.getInfoLabel("Player.Volume")
-# currentVolume = int((float(currentVolume.split(" ")[0])+60.0)/60.0*100.0)
-# trailer_type = int(addon.getSetting('trailer_type'))
-# hide_info = addon.getSetting('hide_info')
-# hide_title = addon.getSetting('hide_title')
-# trailers_path = addon.getSetting('path')
 addon_path = addon.getAddonInfo('path')
-# hide_watched = addon.getSetting('hide_watched')
-# watched_days = addon.getSetting('watched_days')
-# resources_path = xbmc.translatePath( os.path.join( addon_path, 'resources' ) ).decode('utf-8')
-# media_path = xbmc.translatePath( os.path.join( resources_path, 'media' ) ).decode('utf-8')
-# selectedGenre =''
 exit_requested = False
-# movie_file = ''
-#
-# if len(sys.argv) == 2:
-# do_genre ='false'
-#
-# trailer=''
-# info=''
-# do_timeout = False
 played = []
 
 
