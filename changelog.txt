@@ -1,2 +1,5 @@
+v.1.0.1 (March 9, 2016)
+ - Added a sleep after playing the trailer so that we don't accidentally skip
+
 v.1.0.0 (January 11, 2015)
  - Forked randomtrailers and changed it to draw only from Steam

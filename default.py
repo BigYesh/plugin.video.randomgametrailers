@@ -3,7 +3,7 @@
 # Based on random trailers by kzeleny
 #
 # Author - BigYesh
-# Version - 1.0.0
+# Version - 1.0.1
 # Compatibility - Kodi
 #
 
@@ -146,6 +146,7 @@ class TrailerWindow(xbmcgui.WindowXMLDialog):
         if trailer["trailer"] != '' and last_play:
             number_trailers -= 1
             xbmc.Player().play(url)
+            xbmc.sleep(1000)
             number_trailers -= 1
             self.getControl(30011).setLabel('[B]' + trailer['title'] + ' - ' + trailer['source'] + '[/B]')
             self.getControl(30011).setVisible(False)
